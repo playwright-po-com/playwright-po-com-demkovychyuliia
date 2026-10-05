@@ -1,19 +1,10 @@
 import { type Locator, type Page } from '@playwright/test';
-import { BaseModal } from './BaseModal';
 
-/**
- * Component Object модалки реєстрації `.modal-registration`.
- *
- * TODO (студент): скелет за аналогією до LoginModal.
- * Локатори вже є — допишіть:
- *   - selectRole('Відвідувач' | 'Керівник')
- *   - fillRegistrationForm({ lastName, firstName, phone, email, password, confirm })
- *   - submit()
- * Далі підключіть у HomePage композицією (замість getRegistration* локаторів на сторінці).
- */
+import { BaseModal } from './BaseModal';
 export class RegistrationModal extends BaseModal {
   public readonly TITLE = 'Реєстрація' as const;
-  public readonly SUBTITLE = 'Приєднуйтесь до ініціативи «Навчай українською»' as const;
+  public readonly SUBTITLE =
+    'Приєднуйтесь до ініціативи «Навчай українською»' as const;
   public readonly SUBMIT_LABEL = 'Зареєструватися' as const;
 
   private readonly title: Locator;
@@ -30,6 +21,7 @@ export class RegistrationModal extends BaseModal {
 
   constructor(page: Page) {
     super(page, page.locator('.modal-registration'));
+
     this.title = this.root.locator('.registration-title');
     this.subtitle = this.root.locator('.registration-subtitle');
     this.visitorRoleOption = this.root.getByText('Відвідувач', { exact: true });
@@ -40,10 +32,46 @@ export class RegistrationModal extends BaseModal {
     this.emailInput = this.root.locator('#email');
     this.passwordInput = this.root.locator('#password');
     this.confirmPasswordInput = this.root.locator('#confirm');
-    this.submitButton = this.root.getByRole('button', { name: this.SUBMIT_LABEL, exact: true });
+    this.submitButton = this.root.getByRole('button', {
+      name: this.SUBMIT_LABEL,
+      exact: true,
+    });
   }
 
-  // TODO (студент): додати методи selectRole / fillRegistrationForm / submit.
+  async selectRole(role: 'Відвідувач' | 'Керівник'): Promise<void> {
+    if (role === 'Відвідувач') {
+      await this.visitorRoleOption.click();
+    } else {
+      await this.managerRoleOption.click();
+    }
+  }
+
+  async fillRegistrationForm({
+    lastName,
+    firstName,
+    phone,
+    email,
+    password,
+    confirm,
+  }: {
+    lastName: string;
+    firstName: string;
+    phone: string;
+    email: string;
+    password: string;
+    confirm: string;
+  }): Promise<void> {
+    await this.lastNameInput.fill(lastName);
+    await this.firstNameInput.fill(firstName);
+    await this.phoneInput.fill(phone);
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.confirmPasswordInput.fill(confirm);
+  }
+
+  async submit(): Promise<void> {
+    await this.submitButton.click();
+  }
 
   getTitleLocator(): Locator {
     return this.title;

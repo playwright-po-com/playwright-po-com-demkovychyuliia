@@ -1,19 +1,40 @@
-import { type Page } from '@playwright/test';
-import { SearchablePage } from './base/SearchablePage';
+import { type Locator, type Page } from '@playwright/test';
 
-/**
- * TODO (студент): детальна новина `/news/:id`.
- * Орієнтир: `ClubDetailPage`.
- *
- * Підказки з DOM:
- * - обгортка: `.news-page`
- * - заголовок: `#major-title`
- * - дата в контенті: `.content-title`
- * - текст: `.content-text`
- */
+import { ROUTES } from '../config/app.config';
+
+import { SearchablePage } from './base/SearchablePage';
 export class NewsDetailPage extends SearchablePage {
+  private readonly newsPage: Locator;
+  private readonly title: Locator;
+  private readonly date: Locator;
+  private readonly content: Locator;
+
   constructor(page: Page) {
     super(page);
-    // TODO: локатори + gotoNewsDetailPage(id) + getters
+
+    this.newsPage = page.locator('.news-page');
+    this.title = page.locator('#major-title');
+    this.date = page.locator('.content-title');
+    this.content = page.locator('.content-text');
+  }
+
+  async gotoNewsDetailPage(id: string | number): Promise<void> {
+    await this.open(ROUTES.newsDetail(id));
+  }
+
+  getNewsPageLocator(): Locator {
+    return this.newsPage;
+  }
+
+  getTitleLocator(): Locator {
+    return this.title;
+  }
+
+  getDateLocator(): Locator {
+    return this.date;
+  }
+
+  getContentLocator(): Locator {
+    return this.content;
   }
 }
