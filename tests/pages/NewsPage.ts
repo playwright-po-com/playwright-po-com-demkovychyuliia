@@ -1,22 +1,39 @@
-import { type Page } from '@playwright/test';
-import { PaginatedListPage } from './base/PaginatedListPage';
+import { type Locator, type Page } from '@playwright/test';
 
-/**
- * TODO (студент): сторінка `/news`.
- * Орієнтир композиції: `ClubsPage` (list + pagination через PaginatedListPage).
- *
- * Зробити:
- * - `extends PaginatedListPage`
- * - поле `NewsList` (композиція)
- * - `gotoNewsPage()` через `ROUTES.news`
- * - title «Новини»
- * - за потреби sider `.club-sider` (опційно)
- */
+import { NewsList } from '../components/news/NewsList';
+import { ROUTES } from '../config/app.config';
+
+import { PaginatedListPage } from './base/PaginatedListPage';
 export class NewsPage extends PaginatedListPage {
+  public readonly PAGE_TITLE = 'Новини' as const;
+
+  private readonly pageTitle: Locator;
+  private readonly newsList: NewsList;
+
   constructor(page: Page) {
     super(page);
-    // TODO: newsList = new NewsList(page), pageTitle, ...
+
+    this.pageTitle = page.getByRole('heading', {
+      name: this.PAGE_TITLE,
+      exact: true,
+    });
+
+    this.newsList = new NewsList(page);
   }
 
-  // TODO: gotoNewsPage / waitForNewsLoaded / getNewsList / getPageTitleLocator
+  async gotoNewsPage(): Promise<void> {
+    await this.open(ROUTES.news);
+  }
+
+  async waitForNewsLoaded(): Promise<void> {
+    await this.newsList.waitForLoaded();
+  }
+
+  getNewsList(): NewsList {
+    return this.newsList;
+  }
+
+  getPageTitleLocator(): Locator {
+    return this.pageTitle;
+  }
 }
